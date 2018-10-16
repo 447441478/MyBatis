@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- 采用接口开发时，namespace的值必须是接口类的类全名
+ -->
+<mapper namespace="cn.hncu.multiTable.domain.BookMapper">
+	
+	<!--  
+		SELECT s.id sid,s.name sname,b.id bid,b.NAME bname,b.price bprice
+		FROM student s 
+		JOIN book b 
+		ON s.id=b.sid 
+		ORDER BY s.id ASC
+	-->
+	<!-- 定义结果映射 -->
+	<resultMap type="cn.hncu.multiTable.domain.Book" id="bookRes">
+		<id property="id" column="bid" />
+		<result property="name" column="bname" />
+		<result property="price" column="bprice" />
+		<!-- association用于一对一，一本书只属于一个学生 -->
+		<association property="student" javaType="cn.hncu.multiTable.domain.Student">
+			<id property="id" column="sid"/>
+			<result property="name" column="sname"/>
+		</association>
+	</resultMap>
+	<!-- 查询有属主的书籍情况 -->
+	<select id="mulTabQuery" resultMap="bookRes" > <!-- 引用结果映射 -->
+		SELECT b.id bid,b.NAME bname,b.price bprice,
+			   s.id sid,s.name sname
+		FROM book b
+		INNER JOIN student s
+		ON b.sid = s.id
+	</select>
+	
+</mapper>
+  

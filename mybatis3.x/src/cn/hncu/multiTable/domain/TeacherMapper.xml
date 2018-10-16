@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+
+<mapper namespace="cn.hncu.multiTable.domain.TeacherMapper">
+	
+	<!-- 查询哪些老师教了哪些学生 -->
+	<resultMap type="cn.hncu.multiTable.domain.Teacher" id="teacherResMap">
+		<id property="id" column="tid"/>
+		<result property="name" column="tname"/>
+		<result property="tel" column="t_Tel"/>
+		<collection property="students" javaType="cn.hncu.multiTable.domain.Student">
+			<id property="id" column="sid" />
+			<result property="name" column="sname"/>
+		</collection>
+	</resultMap>
+	<select id="query1" resultMap="teacherResMap">
+		SELECT t.id AS tid, t.name AS tname, t.tel AS t_Tel,
+			   s.id AS sid, s.name AS sname
+		FROM teacher t LEFT JOIN ST st
+		ON st.tid=t.id LEFT JOIN student s
+		ON s.id=st.sid
+	</select>
+	
+</mapper>
+  

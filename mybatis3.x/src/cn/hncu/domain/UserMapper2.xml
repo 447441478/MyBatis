@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 使用cn.hncu.domain.UserMapper2接口 -->
+<mapper namespace="cn.hncu.domain.UserMapper2">
+	<!-- 学习动态SQL技术，即熟悉标签: if、
+         choose(when,otherwise)、trim(where,set)、foreach  -->
+    <!-- 使用if标签，进行条件查询-->
+	<select id="dynamicQuery1" resultType="User" parameterType="map">
+		select * 
+		from user 
+		where 1=1
+		<if test=" id!=null and id>0 ">
+			and id=#{id}
+		</if>
+		<!-- 存在bug,如果没有上面的条件 则变成：where 1=1 or ... 
+			   出现永真情况，所以复杂查询需要配合where标签 -->
+		<if test=" name != null and name != '' ">
+			or name like "%"#{name}"%"
+		</if>
+		<if test=" age != null and age>0">
+			or age > #{age}
+		</if>
+	</select>
+	
+	<!-- 使用where标签,使复杂查询变动的更灵活 -->
+	<select id="dynamicQuery2" resultType="User" parameterType="map">
+		select * 
+		from user 
+		<where>
+			<if test=" id!=null and id>0 ">
+				and id=#{id}
+			</if>
+			<if test=" name != null and name != '' ">
+				or name like "%"#{name}"%"
+			</if>
+			<if test=" age != null and age>0">
+				or age > #{age}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 使用trim 可以自定义被包含的sql脚本端的 前缀、后缀，去掉前面多余的语句、后面多余的语句 -->
+	<select id="dynamicQuery3" resultType="User" parameterType="map">
+		select * 
+		from user 
+		<!-- 下面这样使用trim标签等价于 where标签 -->
+		<trim prefix="where" prefixOverrides="or|and">
+			<if test=" id!=null and id>0 ">
+				and id=#{id}
+			</if>
+			<if test=" name != null and name != '' ">
+				or name like "%"#{name}"%"
+			</if>
+			<if test=" age != null and age>0">
+				or age > #{age}
+			</if>
+		</trim>
+	</select>
+	
+		<!-- 运用场合极少，一般用多个if标签即可替代
+			<choose>
+				<when test=""></when>
+	          	<when test=""></when>
+	          	<otherwise></otherwise>
+	       	</choose>
+		--> 
+		
+	<!-- 使用set标签：用于修改 -->
+	<update id="dynamicUpdate" parameterType="map">
+		update user
+		<set>     <!-- set标签会自动去掉多余的, -->
+			<if test=" name != null ">
+				name=#{name},
+			</if>
+			<if test=" age != null ">
+				age=#{age},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<!-- select * from user where id in(1,5,10,6,30) -->
+	<!-- 使用foreach标签 -->
+	<select id="inQuery" parameterType="list" resultType="User">
+		select * 
+		from user
+		<if test="list != null and list.size() > 0">
+			where id in
+			<foreach collection="list" 
+					 open="(" 
+					 separator="," 
+					 close=")"
+					 item="value" >
+				#{value}
+			</foreach>
+		</if>
+	</select>
+	
+	<!-- and <=> && ===》 &amp;&amp; -->
+	
+</mapper>
+  

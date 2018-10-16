@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- '类型别名' 是为 Java类型设置一个短的名字。它只和 'XML配置'有关，存在的意义仅在于用来减少类完全限定名的冗余 -->
+	<typeAliases>
+		<typeAlias alias="User" type="cn.hncu.domain.User" />
+	</typeAliases>
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="com.mysql.jdbc.Driver" />
+				<!-- &amp; 转义  -->
+				<property name="url" value="jdbc:mysql:///mybatis?useUnicode=true&amp;characterEncoding=utf-8" />
+				<property name="username" value="root" />
+				<property name="password" value="1234" />
+				
+				<!-- 在任意时间可以存在的活动（也就是正在使用）连接数量，默认值：10-->
+				<property name="poolMaximumActiveConnections" value="5"/>
+				<!-- 在被强制返回之前，池中连接被检出（checked out）时间，默认值：20000 毫秒（即 20 秒） -->
+				<property name="poolMaximumCheckoutTime" value="30000"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	
+	<mappers>
+		<!-- 使用相对于类路径的资源引用 -->
+		<mapper resource="cn/hncu/domain/PersonMapper.xml" />
+		
+		<!-- 使用映射器接口实现类的完全限定类名 -->
+		<mapper class="cn.hncu.domain.UserMapper"/>
+		
+		<!-- 使用相对于类路径的资源引用 -->
+		<mapper resource="cn/hncu/domain/UserMapper2.xml"/>
+		
+		
+		<!-- 使用映射器接口实现类的完全限定类名 -->
+		<mapper class="cn.hncu.multiTable.domain.StudentMapper"/>
+		<mapper class="cn.hncu.multiTable.domain.BookMapper"/>
+		<mapper class="cn.hncu.multiTable.domain.TeacherMapper"/>
+		
+	</mappers>
+	<!-- 
+	 -->
+</configuration>

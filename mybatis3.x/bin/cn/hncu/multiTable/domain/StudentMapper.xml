@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- 采用接口开发时，namespace的值必须是接口类的类全名
+ -->
+<mapper namespace="cn.hncu.multiTable.domain.StudentMapper">
+	
+	<!--  
+		SELECT s.id sid,s.name sname,b.id bid,b.NAME bname,b.price bprice
+		FROM student s 
+		JOIN book b 
+		ON s.id=b.sid 
+		ORDER BY s.id ASC
+	-->
+	<!-- 定义结果映射 -->
+	<resultMap type="cn.hncu.multiTable.domain.Student" id="studResMap">
+		<id property="id" column="sid" />
+		
+		<!-- javaType 和  jdbcType 可以省略-->
+		<result property="name" javaType="string" column="sname" jdbcType="VARCHAR"/>
+		
+		<!-- 存储多方时，必须指定  javaType 不然报错-->
+		<collection property="books" javaType="cn.hncu.multiTable.domain.Book">
+			<id property="id" column="bid"/>
+			<result property="name" column="bname"/>
+			<result property="price" javaType="double" column="bprice" jdbcType="NUMERIC"/>
+		</collection>
+	</resultMap>
+	<!-- 查询哪些人有那些书 -->
+	<select id="mulTabInnerJoin" resultMap="studResMap" > <!-- 引用结果映射 -->
+		SELECT s.id sid,s.name sname,
+			   b.id bid,b.NAME bname,b.price bprice
+		FROM student s 
+		INNER JOIN book b 
+		ON s.id=b.sid 
+		ORDER BY s.id ASC
+	</select>
+	
+	<!-- 查询每个人的书籍情况 -->
+	<!-- 法1 -->
+	<select id="mulTabLeftJoin" resultMap="studResMap">
+		SELECT s.id sid,s.name sname,
+			   b.id bid,b.NAME bname,b.price bprice
+		FROM student s 
+		LEFT JOIN book b 
+		ON s.id=b.sid 
+	</select>
+	<!-- 法2 -->
+	<resultMap type="cn.hncu.multiTable.domain.Student" id="studResMap2">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<collection property="books" 
+					column="id" select="queryBooksByFK_sid" />
+		<!-- column属性的值是指定 主查询结果中哪个字段用于子查询条件关联 -->
+	</resultMap>
+	<select id="mulTabSubQuery" resultMap="studResMap2">
+		select * from student
+	</select>
+	<select id="queryBooksByFK_sid" resultType="cn.hncu.multiTable.domain.Book">
+		select * 
+		from book 
+		where sid=#{id}
+	</select>
+	
+</mapper>
+  

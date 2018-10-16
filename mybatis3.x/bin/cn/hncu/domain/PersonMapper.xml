@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- 采用接口开发时，namespace的值必须是接口类的类全名
+	  不采用接口时以随便取
+	  作用：当多个Mapper.xml文件中有重复的 id 时，通过namespace进行进一步标识。
+ -->
+<mapper namespace="p">
+	<!-- 查询有返回结果时必须给返回类型 -->
+	<select id="all" resultType="cn.hncu.domain.Person">
+		select * from person
+	</select>
+</mapper>
+  

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- 采用接口开发时，namespace的值必须是接口类的类全名
+ -->
+<mapper namespace="cn.hncu.domain.UserMapper">
+	<!-- 使用接口开发，接口中的方法名必须跟id值一致 -->
+	<select id="all" resultType="User"> <!-- 由于mybatis中设置了别名，所以resultType可以使用别名 -->
+		select * from user
+	</select>
+	
+	<!-- 单条件查询 -->
+	<select id="query1" parameterType="int" resultType="User">
+		select * from user where id=#{id}
+	</select>
+	
+	<!-- 多条件查询 使用POJO、map、list或者QueryValueModel  parameterMap已经不推荐使用  -->
+	
+	<!-- 
+		 select * from user where id=#{id} or name LIKE "%"#{name}"%"   AC
+		 select * from user where id=#{id} or name LIKE concat("%",#{name},"%")    AC
+		 select * from user where id=#{id} or name LIKE "%${name}%"    AC
+	-->
+	<!-- 使用${}类似于EL表达式，与 #{}相比，它不会把特殊字符进行转义，有安全隐患-->
+	<select id="query2" parameterType="cn.hncu.domain.User" resultType="User">
+		select * from user where id=#{id} or name LIKE concat("%",#{name},"%")
+	</select>
+	
+	<!-- 范围查询使用查询值对象 -->
+	<select id="query3" parameterType="cn.hncu.domain.UserQueryModel" resultType="User">
+		select * 
+		from user 
+		where id=#{id} 
+		or age <![CDATA[>=]]> #{age} 
+		and age <![CDATA[<=]]> #{age2} 
+	</select>
+	
+	<!-- 范围查询使用map封装条件 -->
+	<select id="query4" parameterType="map" resultType="User">
+		select * 
+		from user 
+		where id=#{id} 
+		or age <![CDATA[>=]]> #{age} 
+		and age <![CDATA[<=]]> #{age2} 
+	</select>
+	
+	<!-- 增 -->
+	<insert id="add" parameterType="User" >
+		insert into 
+		user(name,age) 
+		values(#{name},#{age})
+	</insert>
+	
+	<!-- 删 -->
+	<delete id="del" parameterType="int">
+		delete from user where id=#{id}
+	</delete>
+	<!-- 改 -->
+	<update id="update" parameterType="User">
+		update user 
+		set name=#{name}, age=#{age} 
+		where id=#{id}
+	</update>
+	
+	<!-- 下面演示使用 sql标签，作用：当一条sql重复使用时，可以使用sql标签定义，
+		   使用时用include标签引入一下就可以了 
+	-->
+	<sql id="userColumn">
+		id,name,age
+	</sql>
+	<select id="sqlDemo" resultType="User">
+		select <include refid="userColumn"/> from user
+	</select>
+	
+	<!-- 下面演示获取自动增长id
+		   当parameterType为值对象时，keyProperty必须与值对象中的主键属名一致
+		   如果想要不一致可以使用 map 作为parameterType的值，读取时通过keyProperty的值作为key
+	-->
+	<insert id="autoKeys" 
+			useGeneratedKeys="true"
+			keyProperty="id"
+			parameterType="User">
+		insert into 
+		user(name,age) 
+		values(#{name},#{age})
+	</insert>
+	<insert id="autoKeys2" 
+			useGeneratedKeys="true"
+			keyProperty="iid"
+			parameterType="map">
+		insert into 
+		user(name,age) 
+		values(#{name},#{age})
+	</insert>
+	
+</mapper>
+  
